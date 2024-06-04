@@ -1,7 +1,10 @@
 package org.example;
 
-public class AdjacencyMatrix extends Matrix {
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
+public class AdjacencyMatrix extends Matrix {
     public AdjacencyMatrix(int node) {
         super(node, node);
     }
@@ -48,20 +51,27 @@ public class AdjacencyMatrix extends Matrix {
         return result;
     }
 
-    public int[][] calculateDistances() {
-        int[][] distances = new int[rows][cols];
+    public Matrix calculateDistances() {
+        Matrix distances = new Matrix(rows, cols);
+
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                distances[i][j] = (i == j) ? 0 : (data[i][j] == 0 ? Integer.MAX_VALUE : data[i][j]);
+                if (i == j) {
+                    distances.setElement(i, j, 0);
+                } else if (this.getElement(i, j) != 0) {
+                    distances.setElement(i, j, this.getElement(i, j));
+                } else {
+                    distances.setElement(i, j, Integer.MAX_VALUE);
+                }
             }
         }
 
         for (int k = 0; k < rows; k++) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    if (distances[i][k] != Integer.MAX_VALUE && distances[k][j] != Integer.MAX_VALUE &&
-                            distances[i][k] + distances[k][j] < distances[i][j]) {
-                        distances[i][j] = distances[i][k] + distances[k][j];
+                    if (distances.getElement(i, k) != Integer.MAX_VALUE && distances.getElement(k, j) != Integer.MAX_VALUE &&
+                            distances.getElement(i, k) + distances.getElement(k, j) < distances.getElement(i, j)) {
+                        distances.setElement(i, j, distances.getElement(i, k) + distances.getElement(k, j));
                     }
                 }
             }
@@ -71,12 +81,12 @@ public class AdjacencyMatrix extends Matrix {
     }
 
     public int calculateRadius() {
-        int[][] distances = calculateDistances();
+        Matrix distances = calculateDistances();
         int radius = Integer.MAX_VALUE;
         for (int i = 0; i < rows; i++) {
             int maxDistance = 0;
             for (int j = 0; j < cols; j++) {
-                maxDistance = Math.max(maxDistance, distances[i][j]);
+                maxDistance = Math.max(maxDistance, distances.getElement(i,j));
             }
             radius = Math.min(radius, maxDistance);
         }
@@ -84,17 +94,104 @@ public class AdjacencyMatrix extends Matrix {
     }
 
     public int calculateDiameter() {
-        int[][] distances = calculateDistances();
+        Matrix distances = calculateDistances();
         int diameter = 0;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                if (distances[i][j] != Integer.MAX_VALUE) {
-                    diameter = Math.max(diameter, distances[i][j]);
+                if (distances.getElement(i,j) != Integer.MAX_VALUE) {
+                    diameter = Math.max(diameter, distances.getElement(i,j));
                 } else {
                     return -1;
                 }
             }
         }
         return diameter;
+    }
+
+    public void exportMatrix (String filename) throws GraphException {
+        if (filename == null || !filename.endsWith(".csv")) {
+            throw new GraphException("Fehler: Dateiname ist 'null' oder ungültig");
+        }
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
+            String separator = System.getProperty("path.separator");
+            for (int i = 0; i < rows; i++) {
+                StringBuilder line = new StringBuilder();
+                for (int j = 0; j < cols; j++) {
+                    line.append(data[i][j]).append(separator);
+                }
+                line.delete(line.length()-1, line.length());
+                bw.write(line.toString());
+                bw.newLine();
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public AdjacencyMatrix importMatrix(String filename) throws GraphException {
+        if (filename == null || !filename.endsWith(".csv")) {
+            throw new GraphException("Fehler: Dateiname  ist 'null' oder ungültig");
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            int rowCount = 0;
+            while ((line = br.readLine()) != null) {
+                rowCount++;
+            }
+
+            AdjacencyMatrix importedMatrix = new AdjacencyMatrix(rowCount);
+
+            try (BufferedReader br2 = new BufferedReader(new FileReader(filename))) {
+                int row = 0;
+                while ((line = br2.readLine()) != null) {
+                    String[] values = line.split(";");
+                    for (int col = 0; col < values.length; col++) {
+                        int value = Integer.parseInt(values[col]);
+                        importedMatrix.setElement(row, col, value);
+                    }
+                    row++;
+                }
+            }
+            return importedMatrix;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int[] calculateEccentricities() {
+        Matrix distances = calculateDistances();
+        int[] eccentricities = new int[rows];
+
+        for (int i = 0; i < rows; i++) {
+            int maxDistance = 0;
+            for (int j = 0; j < cols; j++) {
+                if (distances.getElement(i,j) != Integer.MAX_VALUE) {
+                    maxDistance = Math.max(maxDistance, distances.getElement(i,j));
+                }
+            }
+            eccentricities[i] = maxDistance;
+        }
+
+        return eccentricities;
+    }
+
+    public List<Integer> calculateCenter() {
+        int[] eccentricities = calculateEccentricities();
+        int minEccentricity = Integer.MAX_VALUE;
+
+        for (int e : eccentricities) {
+            minEccentricity = Math.min(minEccentricity, e);
+        }
+
+        List<Integer> centerNodes = new ArrayList<>();
+        for (int i = 0; i < eccentricities.length; i++) {
+            if (eccentricities[i] == minEccentricity) {
+                centerNodes.add(i);
+            }
+        }
+
+        return centerNodes;
     }
 }
