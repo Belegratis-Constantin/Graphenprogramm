@@ -38,6 +38,14 @@ public class Matrix {
         }
     }
 
+    public int getCols() {
+        return cols;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
     public Matrix add(Matrix other) {
         if (this.rows != other.rows || this.cols != other.cols) {
             throw new IllegalArgumentException("Matrices dimensions must match for addition");

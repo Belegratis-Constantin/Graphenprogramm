@@ -108,9 +108,9 @@ public class AdjacencyMatrix extends Matrix {
         return diameter;
     }
 
-    public void exportMatrix (String filename) throws GraphException {
+    public void exportMatrix (String filename) throws MatrixException {
         if (filename == null || !filename.endsWith(".csv")) {
-            throw new GraphException("Fehler: Dateiname ist 'null' oder ungültig");
+            throw new MatrixException("Fehler: Dateiname ist 'null' oder ungültig");
         }
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
             String separator = System.getProperty("path.separator");
@@ -129,9 +129,9 @@ public class AdjacencyMatrix extends Matrix {
         }
     }
 
-    public AdjacencyMatrix importMatrix(String filename) throws GraphException {
+    public AdjacencyMatrix importMatrix(String filename) throws MatrixException {
         if (filename == null || !filename.endsWith(".csv")) {
-            throw new GraphException("Fehler: Dateiname  ist 'null' oder ungültig");
+            throw new MatrixException("Fehler: Dateiname  ist 'null' oder ungültig");
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {

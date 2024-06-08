@@ -3,96 +3,185 @@ package org.example;
 import java.util.*;
 
 public class Graph {
-    private int V; // Number of vertices
-    private List<List<Integer>> adj; // Adjacency list
+    private final int V;
     private boolean[] visited;
     private int[] parent;
-    private int[] discTime; // Discovery time of each vertex
-    private int[] lowTime; // Low time of each vertex
-    private ArrayList<Integer> articulationPoints;
-    private AdjacencyMatrix adjacencyMatrix; // Adjacency matrix
+    private int[] discTime;
+    private int[] lowTime;
+    private int time;
+    private List<Integer> articulationPoints;
+    private List<int[]> bridges;
+    public final AdjacencyMatrix adjacencyMatrix;
 
     public Graph(int V) {
         this.V = V;
-        adj = new ArrayList<>(V);
-        for (int i = 0; i < V; i++) {
-            adj.add(new ArrayList<>());
-        }
         adjacencyMatrix = new AdjacencyMatrix(V);
     }
 
     public void addEdge(int u, int v) {
-        adj.get(u).add(v);
-        adj.get(v).add(u);
         adjacencyMatrix.addEdge(u, v);
+        adjacencyMatrix.addEdge(v, u);
     }
 
-    // Method to find articulation points
-    public List<Integer> findArticulationPoints() {
+    public boolean hasEdge(int u, int v) {
+        return adjacencyMatrix.hasEdge(u, v);
+    }
+
+    public String findArticulationPoints() {
+        initializeDFS();
+        articulationPoints = new ArrayList<>();
+
+        for (int i = 0; i < V; i++) {
+            if (!visited[i]) {
+                dfs(i, true, false);
+            }
+        }
+
+        StringBuilder result = new StringBuilder();
+        for (Integer articulationPoint : articulationPoints) {
+            result.append(articulationPoint);
+            result.append("; ");
+        }
+        result.delete(result.length()-2, result.length());
+        return result.toString();
+    }
+
+    public String findBridges() {
+        initializeDFS();
+        bridges = new ArrayList<>();
+
+        for (int i = 0; i < V; i++) {
+            if (!visited[i]) {
+                dfs(i, false, true);
+            }
+        }
+
+        bridges.sort(Comparator.comparingInt(e -> e[0]));
+
+        // Format bridges as String
+        StringBuilder result = new StringBuilder();
+        result.append("{");
+        for (int[] bridge : bridges) {
+            result.append(Arrays.toString(bridge));
+            result.append(", ");
+        }
+        result.delete(result.length()-2, result.length());
+        result.append("}");
+        return result.toString();
+    }
+
+    public String findConnectedComponents() {
+        visited = new boolean[V];
+        Arrays.fill(visited, false);
+        List<List<Integer>> components = new ArrayList<>();
+
+        for (int i = 0; i < V; i++) {
+            if (!visited[i]) {
+                List<Integer> component = new ArrayList<>();
+                dfsConnectedComponents(i, component);
+                component.sort(Comparator.comparingInt(e -> e));
+                components.add(component);
+            }
+        }
+
+        components.sort(Comparator.comparingInt(e -> e.get(0)));
+
+        // Format components as String
+        StringBuilder result = getResult(components);
+
+        return result.toString();
+    }
+
+    private void initializeDFS() {
         visited = new boolean[V];
         parent = new int[V];
         discTime = new int[V];
         lowTime = new int[V];
-        articulationPoints = new ArrayList<>();
+        time = 0;
 
-        // Initialize parent and visited arrays
         Arrays.fill(parent, -1);
         Arrays.fill(visited, false);
-
-        // Perform DFS traversal to find articulation points
-        for (int i = 0; i < V; i++) {
-            if (!visited[i]) {
-                dfs(i);
-            }
-        }
-
-        return articulationPoints;
     }
 
-    private void dfs(int u) {
-        int time = 0; // Initialize time variable for this DFS traversal
+    private void dfs(int u, boolean findArticulationPoints, boolean findBridges) {
         visited[u] = true;
-        discTime[u] = lowTime[u] = ++time;
+        discTime[u] = ++time; // Discovery time
+        lowTime[u] = ++time; // Lowest discovery time possible
         int children = 0;
 
-        for (int v : adj.get(u)) {
-            if (!visited[v]) {
-                children++;
-                parent[v] = u;
-                dfs(v);
+        for (int v = 0; v < V; v++) { // Iterate through all possible vertices
+            if (adjacencyMatrix.getElement(u, v) == 1) { // Check if there is an edge between u and v
+                if (!visited[v]) {
+                    children++;
+                    parent[v] = u;
+                    dfs(v, findArticulationPoints, findBridges); // Going deeper from u to v
 
-                // Check if the subtree rooted with v has a connection to an ancestor of u
-                lowTime[u] = Math.min(lowTime[u], lowTime[v]);
+                    // Check if the subtree rooted with v has a connection to an ancestor of u
+                    lowTime[u] = Math.min(lowTime[u], lowTime[v]);
 
-                // Check if u is an articulation point
-                if (parent[u] == -1 && children > 1) {
-                    articulationPoints.add(u);
+                    // Check if u is an articulation point
+                    if (findArticulationPoints) {
+                        if ((parent[u] == -1 && children > 1) || (parent[u] != -1 && lowTime[v] >= discTime[u])) {
+                            articulationPoints.add(u);
+                        }
+                    }
+
+                    // Check for bridge
+                    if (findBridges && lowTime[v] > discTime[u]) {
+                        bridges.add(new int[]{u, v});
+                    }
+                    
+                } else if (v != parent[u]) {
+                    // Update low time of u for back edges
+                    lowTime[u] = Math.min(lowTime[u], discTime[v]);
                 }
-                if (parent[u] != -1 && lowTime[v] >= discTime[u]) {
-                    articulationPoints.add(u);
-                }
-            } else if (v != parent[u]) {
-                // Update low time of u for back edges
-                lowTime[u] = Math.min(lowTime[u], discTime[v]);
             }
         }
     }
 
-    // Method to find connected components
-    public List<List<Integer>> findConnectedComponents() {
-        // TODO
-        return null;
+    private void dfsConnectedComponents(int u, List<Integer> component) {
+        visited[u] = true;
+        component.add(u);
+
+        for (int v = 0; v < V; v++) {
+            if (adjacencyMatrix.getElement(u, v) == 1 && !visited[v]) {
+                dfsConnectedComponents(v, component);
+            }
+        }
     }
 
-    // Method to find bridges
-    public List<List<Integer>> findBridges() {
-        //TODO
-        return null;
+    public int getAdjacencyMatrixElement(int u, int v) {
+        return adjacencyMatrix.data[u][v];
     }
 
-    // Method to display the adjacency matrix
-    public void displayAdjacencyMatrix() {
-        System.out.println(adjacencyMatrix.toString());
+    public Graph importAdjacencyMatrix(AdjacencyMatrix matrix) {
+        Graph graph = new Graph(matrix.rows);
+        for (int i=0; i< matrix.rows; i++) {
+            for (int j=0; j< matrix.cols; j++) {
+                if (matrix.hasEdge(i,j)) {
+                    graph.addEdge(i,j);
+                }
+            }
+        }
+
+        return graph;
+    }
+
+    private StringBuilder getResult(List<List<Integer>> components) {
+        StringBuilder result = new StringBuilder();
+        result.append("(");
+        for (List<Integer> component : components) {
+            result.append("{");
+            for (int i = 0; i < component.size(); i++) {
+                result.append(component.get(i));
+                if (i < component.size() - 1) {
+                    result.append(", ");
+                }
+            }
+            result.append("}; ");
+        }
+        result.delete(result.length()-2, result.length());
+        result.append(")");
+        return result;
     }
 }
-

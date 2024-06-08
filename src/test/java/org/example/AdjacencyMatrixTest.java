@@ -2,8 +2,6 @@ package org.example;
 
 import org.junit.Test;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -69,7 +67,7 @@ public class AdjacencyMatrixTest {
     }
 
     @Test
-    public void testExportMatrix() throws GraphException {
+    public void testExportMatrix() throws MatrixException {
         AdjacencyMatrix graph = new AdjacencyMatrix(10);
         graph.addEdge(0, 1);
         graph.addEdge(1, 2);
@@ -81,7 +79,7 @@ public class AdjacencyMatrixTest {
     }
 
     @Test
-    public void testImportMatrix() throws GraphException {
+    public void testImportMatrix() throws MatrixException {
         AdjacencyMatrix matrix = new AdjacencyMatrix(0).importMatrix("testMatrix.csv");
         AdjacencyMatrix expectedMatrix = new AdjacencyMatrix(10);
         expectedMatrix.addEdge(0,1);
@@ -98,7 +96,7 @@ public class AdjacencyMatrixTest {
     }
 
     @Test
-    public void testImport24n_01Distances() throws GraphException {
+    public void testImport24n_01Distances() throws MatrixException {
         AdjacencyMatrix matrix = new AdjacencyMatrix(0).importMatrix("24n_01.csv");
         int[][] expectedDistancesData = {
                 {0, 1, 2, 2, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 7, 7, 6, 8, 8, 7, 7, 8, 9, 9},
@@ -138,19 +136,19 @@ public class AdjacencyMatrixTest {
     }
 
     @Test
-    public void test24n_01Radius() throws GraphException {
+    public void test24n_01Radius() throws MatrixException {
         AdjacencyMatrix matrix = new AdjacencyMatrix(0).importMatrix("24n_01.csv");
         assertEquals(5, matrix.calculateRadius());
     }
 
     @Test
-    public void test24n_01Diameter() throws GraphException {
+    public void test24n_01Diameter() throws MatrixException {
         AdjacencyMatrix matrix = new AdjacencyMatrix(0).importMatrix("24n_01.csv");
         assertEquals(9, matrix.calculateDiameter());
     }
 
     @Test
-    public void test24n_01CalculateCenter() throws GraphException {
+    public void test24n_01CalculateCenter() throws MatrixException {
         AdjacencyMatrix matrix = new AdjacencyMatrix(0).importMatrix("24n_01.csv");
         List<Integer> expectedCenter = Arrays.asList(7, 9, 10);
 
@@ -158,7 +156,7 @@ public class AdjacencyMatrixTest {
     }
 
     @Test
-    public void test24n_01Eccentricities() throws GraphException {
+    public void test24n_01Eccentricities() throws MatrixException {
         AdjacencyMatrix matrix = new AdjacencyMatrix(0).importMatrix("24n_01.csv");
         int[] eccentricities = matrix.calculateEccentricities();
         int[] expectedEccentricities = {9, 8, 7, 7, 6, 7, 7, 5, 6, 5, 5, 8, 9, 6, 7, 7, 6, 8, 8, 7, 7, 8, 9, 9};
