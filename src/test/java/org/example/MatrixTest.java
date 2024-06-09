@@ -21,7 +21,7 @@ public class MatrixTest {
         assertEquals(9, matrix.getElement(2, 2));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expected = MatrixException.class)
     public void testGetElementInvalidIndex() throws MatrixException {
         Matrix matrix = new Matrix(3, 3);
         matrix.getElement(3, 3);
@@ -34,7 +34,7 @@ public class MatrixTest {
         assertEquals(10, matrix.getElement(0, 0));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expected = MatrixException.class)
     public void testSetElementInvalidIndex() throws MatrixException {
         Matrix matrix = new Matrix(3, 3);
         matrix.setElement(3, 3, 10);
@@ -71,7 +71,7 @@ public class MatrixTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = MatrixException.class)
     public void testAddIncompatibleMatrices() throws MatrixException {
         Matrix matrix1 = new Matrix(2, 3);
         Matrix matrix2 = new Matrix(3, 2);
@@ -106,7 +106,7 @@ public class MatrixTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = MatrixException.class)
     public void testMultiplyIncompatibleMatrices() throws MatrixException {
         Matrix matrix1 = new Matrix(2, 3);
         Matrix matrix2 = new Matrix(2, 3);
