@@ -13,7 +13,7 @@ public class AdjacencyMatrix extends Matrix {
         if (from >= 0 && from < rows && to >= 0 && to < cols) {
             setElement(from, to, 1);
         } else {
-            throw new IndexOutOfBoundsException("Invalid index");
+            throw new MatrixException("Invalid index");
         }
     }
 
@@ -21,7 +21,7 @@ public class AdjacencyMatrix extends Matrix {
         if (from >= 0 && from < rows && to >= 0 && to < cols) {
             setElement(from, to, 0);
         } else {
-            throw new IndexOutOfBoundsException("Invalid index");
+            throw new MatrixException("Invalid index");
         }
     }
 
@@ -29,16 +29,16 @@ public class AdjacencyMatrix extends Matrix {
         if (from >= 0 && from < rows && to >= 0 && to < cols) {
             return getElement(from, to) != 0;
         } else {
-            throw new IndexOutOfBoundsException("Invalid index");
+            throw new MatrixException("Invalid index");
         }
     }
 
     public Matrix power(int exponent) throws MatrixException {
         if (this.rows != this.cols) {
-            throw new IllegalArgumentException("Matrix must be square for exponentiation.");
+            throw new MatrixException("Matrix must be square for exponentiation.");
         }
         if (exponent < 0) {
-            throw new IllegalArgumentException("Exponent isn't allowed to be negative.");
+            throw new MatrixException("Exponent isn't allowed to be negative.");
         }
 
         Matrix result = new Matrix(this.data);
@@ -54,7 +54,7 @@ public class AdjacencyMatrix extends Matrix {
     public Matrix calculateDistances() throws MatrixException {
         Matrix distances = new Matrix(rows, cols);
 
-        for (int i = 0; i < rows; i++) {
+        for (int i=0; i<rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (i == j) {
                     distances.setElement(i, j, 0);
@@ -66,9 +66,9 @@ public class AdjacencyMatrix extends Matrix {
             }
         }
 
-        for (int k = 0; k < rows; k++) {
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
+        for (int k=0; k<rows; k++) {
+            for (int i=0; i<rows; i++) {
+                for (int j=0; j<cols; j++) {
                     if (distances.getElement(i, k) != Integer.MAX_VALUE && distances.getElement(k, j) != Integer.MAX_VALUE &&
                             distances.getElement(i, k) + distances.getElement(k, j) < distances.getElement(i, j)) {
                         distances.setElement(i, j, distances.getElement(i, k) + distances.getElement(k, j));
@@ -83,21 +83,24 @@ public class AdjacencyMatrix extends Matrix {
     public int calculateRadius() throws MatrixException {
         Matrix distances = calculateDistances();
         int radius = Integer.MAX_VALUE;
-        for (int i = 0; i < rows; i++) {
+
+        for (int i=0; i<rows; i++) {
             int maxDistance = 0;
-            for (int j = 0; j < cols; j++) {
+            for (int j=0; j<cols; j++) {
                 maxDistance = Math.max(maxDistance, distances.getElement(i,j));
             }
             radius = Math.min(radius, maxDistance);
         }
+
         return radius == Integer.MAX_VALUE ? -1 : radius;
     }
 
     public int calculateDiameter() throws MatrixException {
         Matrix distances = calculateDistances();
         int diameter = 0;
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+
+        for (int i=0; i<rows; i++) {
+            for (int j=0; j<cols; j++) {
                 if (distances.getElement(i,j) != Integer.MAX_VALUE) {
                     diameter = Math.max(diameter, distances.getElement(i,j));
                 } else {
@@ -105,59 +108,8 @@ public class AdjacencyMatrix extends Matrix {
                 }
             }
         }
+
         return diameter;
-    }
-
-    public void exportMatrix (String filename) throws MatrixException {
-        if (filename == null || !filename.endsWith(".csv")) {
-            throw new MatrixException("Fehler: Dateiname ist 'null' oder ungültig");
-        }
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
-            String separator = System.getProperty("path.separator");
-            for (int i = 0; i < rows; i++) {
-                StringBuilder line = new StringBuilder();
-                for (int j = 0; j < cols; j++) {
-                    line.append(data[i][j]).append(separator);
-                }
-                line.delete(line.length()-1, line.length());
-                bw.write(line.toString());
-                bw.newLine();
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public AdjacencyMatrix importMatrix(String filename) throws MatrixException {
-        if (filename == null || !filename.endsWith(".csv")) {
-            throw new MatrixException("Fehler: Dateiname  ist 'null' oder ungültig");
-        }
-
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-            String line;
-            int rowCount = 0;
-            while ((line = br.readLine()) != null) {
-                rowCount++;
-            }
-
-            AdjacencyMatrix importedMatrix = new AdjacencyMatrix(rowCount);
-
-            try (BufferedReader br2 = new BufferedReader(new FileReader(filename))) {
-                int row = 0;
-                while ((line = br2.readLine()) != null) {
-                    String[] values = line.split(";");
-                    for (int col = 0; col < values.length; col++) {
-                        int value = Integer.parseInt(values[col]);
-                        importedMatrix.setElement(row, col, value);
-                    }
-                    row++;
-                }
-            }
-            return importedMatrix;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public int[] calculateEccentricities() throws MatrixException {
@@ -186,12 +138,66 @@ public class AdjacencyMatrix extends Matrix {
         }
 
         List<Integer> centerNodes = new ArrayList<>();
-        for (int i = 0; i < eccentricities.length; i++) {
+        for (int i=0; i<eccentricities.length; i++) {
             if (eccentricities[i] == minEccentricity) {
                 centerNodes.add(i);
             }
         }
 
         return centerNodes;
+    }
+
+    public void exportMatrix (String filename) throws MatrixException {
+        if (filename == null || !filename.endsWith(".csv")) {
+            throw new MatrixException("Error: Filename is 'null' or not valid (doesn't end with '.csv'");
+        }
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
+            String separator = System.getProperty("path.separator");
+            for (int i=0; i<rows; i++) {
+                StringBuilder line = new StringBuilder();
+                for (int j=0; j<cols; j++) {
+                    line.append(data[i][j]).append(separator);
+                }
+                line.delete(line.length()-1, line.length());
+                bw.write(line.toString());
+                bw.newLine();
+            }
+
+        } catch (IOException e) {
+            throw new MatrixException("Error: ", e);
+        }
+    }
+
+    public AdjacencyMatrix importMatrix(String filename) throws MatrixException {
+        if (filename == null || !filename.endsWith(".csv")) {
+            throw new MatrixException("Error: Filename is 'null' or not valid (doesn't end with '.csv'");
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            int rowCount = 0;
+
+            // get the number of rows to initialize the Adjacency Matrix
+            while ((line = br.readLine()) != null) {
+                rowCount++;
+            }
+
+            AdjacencyMatrix importedMatrix = new AdjacencyMatrix(rowCount);
+
+            try (BufferedReader br2 = new BufferedReader(new FileReader(filename))) {
+                int row = 0;
+                while ((line = br2.readLine()) != null) {
+                    String[] values = line.split(";");
+                    for (int col = 0; col < values.length; col++) {
+                        int value = Integer.parseInt(values[col]);
+                        importedMatrix.setElement(row, col, value);
+                    }
+                    row++;
+                }
+            }
+            return importedMatrix;
+        } catch (IOException e) {
+            throw new MatrixException("Error: ", e);
+        }
     }
 }

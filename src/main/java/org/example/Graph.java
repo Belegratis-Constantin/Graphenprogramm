@@ -21,7 +21,7 @@ public class Graph {
 
     public void addEdge(int u, int v) throws MatrixException {
         adjacencyMatrix.addEdge(u, v);
-        adjacencyMatrix.addEdge(v, u);
+        adjacencyMatrix.addEdge(v, u); // because it is an undirected Graph
     }
 
     public boolean hasEdge(int u, int v) throws MatrixException {
@@ -139,7 +139,6 @@ public class Graph {
         while (!queue.isEmpty()) {
             int u = queue.poll();
 
-            // if destination was found recreate the path
             if (u == dest) {
                 List<Integer> path = new ArrayList<>();
                 for (int at = dest; at != -1; at = parent[at]) {
@@ -149,12 +148,11 @@ public class Graph {
                 return path;
             }
 
-            // visit all neighbours
-            for (int v = 0; v < V; v++) {
-                if (adjacencyMatrix.getElement(u, v) == 1 && !visited[v]) {
-                    visited[v] = true;
-                    parent[v] = u;
-                    queue.add(v);
+            for (int neighbors=0; neighbors<V; neighbors++) {
+                if (adjacencyMatrix.getElement(u, neighbors) == 1 && !visited[neighbors]) {
+                    visited[neighbors] = true;
+                    parent[neighbors] = u;
+                    queue.add(neighbors);
                 }
             }
         }
@@ -164,11 +162,11 @@ public class Graph {
 
     public int[] greedyColoring() throws MatrixException {
         int[] result = new int[V];
-        Arrays.fill(result, -1); // -1 = no color
-
         boolean[] colorAvailable = new boolean[V];
         boolean[] visited = new boolean[V];
         Queue<Integer> queue = new LinkedList<>();
+
+        Arrays.fill(result, -1); // -1 = no color
 
         for (int startNode=0; startNode<V; startNode++) {
             if (!visited[startNode]) {
@@ -182,7 +180,7 @@ public class Graph {
                     Arrays.fill(colorAvailable, true);
 
                     for (int neighbor=0; neighbor<V; neighbor++) {
-                        if (adjacencyMatrix.getElement(node, neighbor) >= 1 && result[neighbor] != -1) {
+                        if (adjacencyMatrix.getElement(node, neighbor) == 1 && result[neighbor] != -1) {
                             colorAvailable[result[neighbor]] = false;
                         }
                     }
@@ -239,8 +237,8 @@ public class Graph {
         lowTime[u] = ++time; // Lowest discovery time possible
         int children = 0;
 
-        for (int v = 0; v < V; v++) { // Iterate through all possible vertices
-            if (adjacencyMatrix.getElement(u, v) == 1) { // Check if there is an edge between u and v
+        for (int v = 0; v < V; v++) {
+            if (adjacencyMatrix.getElement(u, v) == 1) {
                 if (!visited[v]) {
                     children++;
                     parent[v] = u;
@@ -249,7 +247,6 @@ public class Graph {
                     // Check if the subtree rooted with v has a connection to an ancestor of u
                     lowTime[u] = Math.min(lowTime[u], lowTime[v]);
 
-                    // Check if u is an articulation point
                     if (findArticulationPoints) {
                         if ((parent[u] == -1 && children > 1) || (parent[u] != -1 && lowTime[v] >= discTime[u])) {
                             if (!articulationPoints.contains(u)) {
@@ -258,7 +255,6 @@ public class Graph {
                         }
                     }
 
-                    // Check for bridge
                     if (findBridges && lowTime[v] > discTime[u]) {
                         bridges.add(new int[]{u, v});
                     }

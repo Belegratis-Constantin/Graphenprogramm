@@ -20,7 +20,7 @@ public class AdjacencyMatrixTest {
         assertFalse(graph.hasEdge(0, 2));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expected = MatrixException.class)
     public void testAddEdgeInvalidIndex() throws MatrixException {
         AdjacencyMatrix graph = new AdjacencyMatrix(3);
         graph.addEdge(3, 0);
@@ -35,7 +35,7 @@ public class AdjacencyMatrixTest {
         assertFalse(graph.hasEdge(0, 1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expected = MatrixException.class)
     public void testRemoveEdgeInvalidIndex() throws MatrixException {
         AdjacencyMatrix graph = new AdjacencyMatrix(3);
         graph.removeEdge(3, 0);
@@ -51,7 +51,7 @@ public class AdjacencyMatrixTest {
         assertTrue(graph.hasEdge(1, 0));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expected = MatrixException.class)
     public void testHasEdgeInvalidIndex() throws MatrixException {
         AdjacencyMatrix graph = new AdjacencyMatrix(3);
         graph.hasEdge(3, 0);
