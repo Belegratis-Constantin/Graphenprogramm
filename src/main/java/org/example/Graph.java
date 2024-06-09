@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class Graph {
     private final int V;
@@ -36,6 +37,8 @@ public class Graph {
                 dfs(i, true, false);
             }
         }
+
+        articulationPoints.sort(Comparator.comparingInt(e -> e));
 
         StringBuilder result = new StringBuilder();
         for (Integer articulationPoint : articulationPoints) {
@@ -122,7 +125,9 @@ public class Graph {
                     // Check if u is an articulation point
                     if (findArticulationPoints) {
                         if ((parent[u] == -1 && children > 1) || (parent[u] != -1 && lowTime[v] >= discTime[u])) {
-                            articulationPoints.add(u);
+                            if (!articulationPoints.contains(u)) {
+                                articulationPoints.add(u);
+                            }
                         }
                     }
 
@@ -179,7 +184,7 @@ public class Graph {
         while (!queue.isEmpty()) {
             int u = queue.poll();
 
-            // Wenn das Ziel gefunden wurde, rekonstruiere den Pfad
+            // if destination was found recreate the path
             if (u == dest) {
                 List<Integer> path = new ArrayList<>();
                 for (int at = dest; at != -1; at = parent[at]) {
@@ -189,7 +194,7 @@ public class Graph {
                 return path;
             }
 
-            // Besuche alle Nachbarn
+            // visit all neighbours
             for (int v = 0; v < V; v++) {
                 if (adjacencyMatrix.getElement(u, v) == 1 && !visited[v]) {
                     visited[v] = true;
@@ -199,7 +204,66 @@ public class Graph {
             }
         }
 
-        return new ArrayList<>(); // Kein Pfad gefunden
+        return new ArrayList<>(); // no path found
+    }
+
+    public int[] greedyColoring() {
+        int[] result = new int[V];
+        Arrays.fill(result, -1); // -1 = no color
+
+        boolean[] colorAvailable = new boolean[V];
+        boolean[] visited = new boolean[V];
+        Queue<Integer> queue = new LinkedList<>();
+
+        for (int startNode=0; startNode<V; startNode++) {
+            if (!visited[startNode]) {
+                queue.add(startNode);
+                result[startNode] = 0;
+                visited[startNode] = true;
+
+                while (!queue.isEmpty()) {
+                    int node = queue.poll();
+
+                    Arrays.fill(colorAvailable, true);
+                    for (int neighbor=0; neighbor<V; neighbor++) {
+                        if (adjacencyMatrix.getElement(node, neighbor) == 1 && result[neighbor] != -1) {
+                            colorAvailable[result[neighbor]] = false;
+                        }
+                    }
+
+                    for (int color=0; color<V; color++) {
+                        if (colorAvailable[color]) {
+                            result[node] = color;
+                            break;
+                        }
+                    }
+
+                    for (int neighbor=0; neighbor<V; neighbor++) {
+                        if (adjacencyMatrix.getElement(node, neighbor) == 1 && !visited[neighbor]) {
+                            queue.add(neighbor);
+                            visited[neighbor] = true;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+
+    public boolean isBipartite() {
+        return Arrays.stream(greedyColoring()).noneMatch(e -> e==2);
+    }
+
+    public boolean isCompleteGraph() {
+        for (int i=0; i<V; i++) {
+            for (int j=0; j<V; j++) {
+                if(!hasEdge(i,j) && i!=j) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private StringBuilder getResult(List<List<Integer>> components) {
