@@ -9,7 +9,7 @@ public class AdjacencyMatrix extends Matrix {
         super(node, node);
     }
 
-    public void addEdge(int from, int to) {
+    public void addEdge(int from, int to) throws MatrixException {
         if (from >= 0 && from < rows && to >= 0 && to < cols) {
             setElement(from, to, 1);
         } else {
@@ -17,7 +17,7 @@ public class AdjacencyMatrix extends Matrix {
         }
     }
 
-    public void removeEdge(int from, int to) {
+    public void removeEdge(int from, int to) throws MatrixException {
         if (from >= 0 && from < rows && to >= 0 && to < cols) {
             setElement(from, to, 0);
         } else {
@@ -25,7 +25,7 @@ public class AdjacencyMatrix extends Matrix {
         }
     }
 
-    public boolean hasEdge(int from, int to) {
+    public boolean hasEdge(int from, int to) throws MatrixException {
         if (from >= 0 && from < rows && to >= 0 && to < cols) {
             return getElement(from, to) != 0;
         } else {
@@ -33,7 +33,7 @@ public class AdjacencyMatrix extends Matrix {
         }
     }
 
-    public Matrix power(int exponent) {
+    public Matrix power(int exponent) throws MatrixException {
         if (this.rows != this.cols) {
             throw new IllegalArgumentException("Matrix must be square for exponentiation.");
         }
@@ -51,7 +51,7 @@ public class AdjacencyMatrix extends Matrix {
         return result;
     }
 
-    public Matrix calculateDistances() {
+    public Matrix calculateDistances() throws MatrixException {
         Matrix distances = new Matrix(rows, cols);
 
         for (int i = 0; i < rows; i++) {
@@ -80,7 +80,7 @@ public class AdjacencyMatrix extends Matrix {
         return distances;
     }
 
-    public int calculateRadius() {
+    public int calculateRadius() throws MatrixException {
         Matrix distances = calculateDistances();
         int radius = Integer.MAX_VALUE;
         for (int i = 0; i < rows; i++) {
@@ -93,7 +93,7 @@ public class AdjacencyMatrix extends Matrix {
         return radius == Integer.MAX_VALUE ? -1 : radius;
     }
 
-    public int calculateDiameter() {
+    public int calculateDiameter() throws MatrixException {
         Matrix distances = calculateDistances();
         int diameter = 0;
         for (int i = 0; i < rows; i++) {
@@ -160,7 +160,7 @@ public class AdjacencyMatrix extends Matrix {
         }
     }
 
-    public int[] calculateEccentricities() {
+    public int[] calculateEccentricities() throws MatrixException {
         Matrix distances = calculateDistances();
         int[] eccentricities = new int[rows];
 
@@ -177,7 +177,7 @@ public class AdjacencyMatrix extends Matrix {
         return eccentricities;
     }
 
-    public List<Integer> calculateCenter() {
+    public List<Integer> calculateCenter() throws MatrixException {
         int[] eccentricities = calculateEccentricities();
         int minEccentricity = Integer.MAX_VALUE;
 

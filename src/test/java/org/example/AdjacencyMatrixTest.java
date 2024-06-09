@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AdjacencyMatrixTest {
     @Test
-    public void testAddEdge() {
+    public void testAddEdge() throws MatrixException {
         AdjacencyMatrix graph = new AdjacencyMatrix(3);
         graph.addEdge(0, 1);
         graph.addEdge(1, 2);
@@ -21,13 +21,13 @@ public class AdjacencyMatrixTest {
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
-    public void testAddEdgeInvalidIndex() {
+    public void testAddEdgeInvalidIndex() throws MatrixException {
         AdjacencyMatrix graph = new AdjacencyMatrix(3);
         graph.addEdge(3, 0);
     }
 
     @Test
-    public void testRemoveEdge() {
+    public void testRemoveEdge() throws MatrixException {
         AdjacencyMatrix graph = new AdjacencyMatrix(3);
         graph.addEdge(0, 1);
         assertTrue(graph.hasEdge(0, 1));
@@ -36,13 +36,13 @@ public class AdjacencyMatrixTest {
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
-    public void testRemoveEdgeInvalidIndex() {
+    public void testRemoveEdgeInvalidIndex() throws MatrixException {
         AdjacencyMatrix graph = new AdjacencyMatrix(3);
         graph.removeEdge(3, 0);
     }
 
     @Test
-    public void testHasEdge() {
+    public void testHasEdge() throws MatrixException {
         AdjacencyMatrix graph = new AdjacencyMatrix(3);
         graph.addEdge(0, 1);
         assertTrue(graph.hasEdge(0, 1));
@@ -52,13 +52,13 @@ public class AdjacencyMatrixTest {
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
-    public void testHasEdgeInvalidIndex() {
+    public void testHasEdgeInvalidIndex() throws MatrixException {
         AdjacencyMatrix graph = new AdjacencyMatrix(3);
         graph.hasEdge(3, 0);
     }
 
     @Test
-    public void testToString() {
+    public void testToString() throws MatrixException {
         AdjacencyMatrix graph = new AdjacencyMatrix(3);
         graph.addEdge(0, 1);
         graph.addEdge(1, 2);

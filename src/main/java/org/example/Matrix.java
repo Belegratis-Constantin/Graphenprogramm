@@ -22,19 +22,19 @@ public class Matrix {
         this.data = new int[rows][cols];
     }
 
-    public int getElement(int row, int col) {
+    public int getElement(int row, int col) throws MatrixException {
         if (row >= 0 && row < rows && col >= 0 && col < cols) {
             return data[row][col];
         } else {
-            throw new IndexOutOfBoundsException("Invalid index");
+            throw new MatrixException("Invalid index");
         }
     }
 
-    public void setElement(int row, int col, int value) {
+    public void setElement(int row, int col, int value) throws MatrixException {
         if (row >= 0 && row < rows && col >= 0 && col < cols) {
             data[row][col] = value;
         } else {
-            throw new IndexOutOfBoundsException("Invalid index");
+            throw new MatrixException("Invalid index");
         }
     }
 
@@ -46,9 +46,9 @@ public class Matrix {
         return rows;
     }
 
-    public Matrix add(Matrix other) {
+    public Matrix add(Matrix other) throws MatrixException {
         if (this.rows != other.rows || this.cols != other.cols) {
-            throw new IllegalArgumentException("Matrices dimensions must match for addition");
+            throw new MatrixException("Matrices dimensions must match for addition");
         }
 
         Matrix result = new Matrix(this.rows, this.cols);
@@ -60,9 +60,9 @@ public class Matrix {
         return result;
     }
 
-    public Matrix multiply(Matrix other) {
+    public Matrix multiply(Matrix other) throws MatrixException {
         if (this.cols != other.rows) {
-            throw new IllegalArgumentException("Matrices dimensions must match for multiplication");
+            throw new MatrixException("Matrices dimensions must match for multiplication");
         }
 
         Matrix result = new Matrix(this.rows, other.cols);

@@ -1,7 +1,7 @@
 package org.example;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MatrixException {
         int[][] data1 = {
                 {0, 1, 1, 1, 0},
                 {1, 0, 0, 1, 1},
