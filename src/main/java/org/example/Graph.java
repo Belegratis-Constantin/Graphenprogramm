@@ -6,8 +6,8 @@ public class Graph {
     private final int V;
     private boolean[] visited;
     private int[] parent;
-    private int[] discTime;
-    private int[] lowTime;
+    private int[] discTime; // Discovery Time
+    private int[] lowTime; // Lowest discovery time possible
     private int time;
     private List<Integer> articulationPoints;
     private List<int[]> bridges;
@@ -165,6 +165,41 @@ public class Graph {
         }
 
         return graph;
+    }
+
+    public List<Integer> findShortestPath(int src, int dest) {
+        boolean[] visited = new boolean[V];
+        int[] parent = new int[V];
+        Queue<Integer> queue = new LinkedList<>();
+
+        Arrays.fill(parent, -1);
+        visited[src] = true;
+        queue.add(src);
+
+        while (!queue.isEmpty()) {
+            int u = queue.poll();
+
+            // Wenn das Ziel gefunden wurde, rekonstruiere den Pfad
+            if (u == dest) {
+                List<Integer> path = new ArrayList<>();
+                for (int at = dest; at != -1; at = parent[at]) {
+                    path.add(at);
+                }
+                Collections.reverse(path);
+                return path;
+            }
+
+            // Besuche alle Nachbarn
+            for (int v = 0; v < V; v++) {
+                if (adjacencyMatrix.getElement(u, v) == 1 && !visited[v]) {
+                    visited[v] = true;
+                    parent[v] = u;
+                    queue.add(v);
+                }
+            }
+        }
+
+        return new ArrayList<>(); // Kein Pfad gefunden
     }
 
     private StringBuilder getResult(List<List<Integer>> components) {

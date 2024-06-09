@@ -2,6 +2,9 @@ package org.example;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class GraphTest {
@@ -78,5 +81,78 @@ class GraphTest {
 
         String expectedBridges = "{[0, 1], [6, 11], [11, 12], [20, 21]}";
         assertEquals(expectedBridges, graph.findBridges());
+    }
+
+    @Test
+    void testFindShortestPath() {
+        Graph graph = new Graph(10);
+        graph.addEdge(0,4);
+        graph.addEdge(0,8);
+        graph.addEdge(1,8);
+        graph.addEdge(8,2);
+        graph.addEdge(1,2);
+
+        List<Integer> expectedRoute = new ArrayList<>();
+        expectedRoute.add(0);
+        expectedRoute.add(8);
+        expectedRoute.add(2);
+
+        assertEquals(expectedRoute, graph.findShortestPath(0,2));
+    }
+
+    @Test
+    void testFindShortestPath24n_01_A_U() throws MatrixException {
+        AdjacencyMatrix matrix = new AdjacencyMatrix(0).importMatrix("24n_01.csv");
+        Graph graph = new Graph(0).importAdjacencyMatrix(matrix);
+
+        List<Integer> expectedRoute = new ArrayList<>();
+        expectedRoute.add(0);
+        expectedRoute.add(1);
+        expectedRoute.add(2);
+        expectedRoute.add(4);
+        expectedRoute.add(7);
+        expectedRoute.add(10);
+        expectedRoute.add(16);
+        expectedRoute.add(15);
+
+        assertEquals(expectedRoute, graph.findShortestPath(0,15));
+    }
+
+    @Test
+    void testFindShortestPath24n_01_A_S() throws MatrixException {
+        AdjacencyMatrix matrix = new AdjacencyMatrix(0).importMatrix("24n_01.csv");
+        Graph graph = new Graph(0).importAdjacencyMatrix(matrix);
+
+        List<Integer> expectedRoute = new ArrayList<>();
+        expectedRoute.add(0);
+        expectedRoute.add(1);
+        expectedRoute.add(2);
+        expectedRoute.add(4);
+        expectedRoute.add(7);
+        expectedRoute.add(10);
+        expectedRoute.add(13);
+        expectedRoute.add(14);
+        expectedRoute.add(18);
+
+        assertEquals(expectedRoute, graph.findShortestPath(0,18));
+    }
+
+    @Test
+    void testFindShortestPath24n_01_M_R() throws MatrixException {
+        AdjacencyMatrix matrix = new AdjacencyMatrix(0).importMatrix("24n_01.csv");
+        Graph graph = new Graph(0).importAdjacencyMatrix(matrix);
+
+        List<Integer> expectedRoute = new ArrayList<>();
+        expectedRoute.add(12);
+        expectedRoute.add(11);
+        expectedRoute.add(6);
+        expectedRoute.add(4);
+        expectedRoute.add(7);
+        expectedRoute.add(10);
+        expectedRoute.add(13);
+        expectedRoute.add(14);
+        expectedRoute.add(17);
+
+        assertEquals(expectedRoute, graph.findShortestPath(12,17));
     }
 }
