@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GraphTest {
 
     @Test
-    void testAddEdge() {
+    void testAddEdge() throws MatrixException {
         Graph graph = new Graph(10);
         graph.addEdge(0,4);
         graph.addEdge(1,8);
@@ -24,7 +24,7 @@ class GraphTest {
     }
 
     @Test
-    void testFindArticulationPoints3() {
+    void testFindArticulationPoints3() throws MatrixException {
         Graph graph = new Graph(10);
         graph.addEdge(0,4);
         graph.addEdge(1,8);
@@ -54,14 +54,14 @@ class GraphTest {
     }
 
     @Test
-    void testFindConnectedComponents() {
+    void testFindConnectedComponents() throws MatrixException {
         Graph graph = new Graph(10);
         graph.addEdge(0,4);
         graph.addEdge(1,8);
         graph.addEdge(8,2);
 
         String expectedComponents = "({0, 4}; {1, 2, 8}; {3}; {5}; {6}; {7}; {9})";
-        assertEquals(expectedComponents, graph.findConnectedComponents());
+        assertEquals(expectedComponents, graph.printConnectedComponents());
     }
 
     @Test
@@ -70,7 +70,7 @@ class GraphTest {
         Graph graph = new Graph(0).importAdjacencyMatrix(matrix);
 
         String expectedComponents = "({0, 1, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 20}; {2}; {4}; {15, 16, 18, 22, 25}; {19, 21, 23, 24})";
-        assertEquals(expectedComponents, graph.findConnectedComponents());
+        assertEquals(expectedComponents, graph.printConnectedComponents());
     }
 
     @Test
@@ -79,11 +79,11 @@ class GraphTest {
         Graph graph = new Graph(0).importAdjacencyMatrix(matrix);
 
         String expectedComponents = "({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23})";
-        assertEquals(expectedComponents, graph.findConnectedComponents());
+        assertEquals(expectedComponents, graph.printConnectedComponents());
     }
 
     @Test
-    void testFindBridges() {
+    void testFindBridges() throws MatrixException {
         Graph graph = new Graph(10);
         graph.addEdge(0,4);
         graph.addEdge(1,8);
@@ -91,7 +91,7 @@ class GraphTest {
         graph.addEdge(1,2);
 
         String expectedBridges = "{[0, 4]}";
-        assertEquals(expectedBridges, graph.findBridges());
+        assertEquals(expectedBridges, graph.printBridges());
     }
 
     @Test
@@ -100,7 +100,7 @@ class GraphTest {
         Graph graph = new Graph(0).importAdjacencyMatrix(matrix);
 
         String expectedBridges = "{[0, 1], [0, 8], [1, 7], [5, 12], [7, 5], [7, 9], [9, 3], [9, 10], [9, 11], [12, 6], [12, 14], [12, 17], [14, 20], [15, 16], [15, 25], [16, 18], [16, 22], [17, 13], [19, 21], [19, 24], [21, 23]}";
-        assertEquals(expectedBridges, graph.findBridges());
+        assertEquals(expectedBridges, graph.printBridges());
     }
 
     @Test
@@ -109,11 +109,11 @@ class GraphTest {
         Graph graph = new Graph(0).importAdjacencyMatrix(matrix);
 
         String expectedBridges = "{[0, 1], [6, 11], [11, 12], [20, 21]}";
-        assertEquals(expectedBridges, graph.findBridges());
+        assertEquals(expectedBridges, graph.printBridges());
     }
 
     @Test
-    void testFindShortestPath() {
+    void testFindShortestPath() throws MatrixException {
         Graph graph = new Graph(10);
         graph.addEdge(0,4);
         graph.addEdge(0,8);
@@ -212,7 +212,7 @@ class GraphTest {
     }
 
     @Test
-    void testGreedyColoring() {
+    void testGreedyColoring() throws MatrixException {
         Graph graph = new Graph(10);
         graph.addEdge(0,4);
         graph.addEdge(1,8);
@@ -234,7 +234,31 @@ class GraphTest {
     }
 
     @Test
-    void testIsBipartiteTrue() {
+    void testGreedyColoringCompleteGraph() throws MatrixException {
+        Graph graph = new Graph(5);
+        graph.addEdge(0,1);
+        graph.addEdge(0,2);
+        graph.addEdge(0,3);
+        graph.addEdge(0,4);
+        graph.addEdge(1,2);
+        graph.addEdge(1,3);
+        graph.addEdge(1,4);
+        graph.addEdge(2,3);
+        graph.addEdge(2,4);
+        graph.addEdge(3,4);
+
+        int[] expectedColors = new int[graph.adjacencyMatrix.rows];
+        expectedColors[0]=0;
+        expectedColors[1]=1;
+        expectedColors[2]=2;
+        expectedColors[3]=3;
+        expectedColors[4]=4;
+
+        assertEquals(Arrays.toString(expectedColors), Arrays.toString(graph.greedyColoring()));
+    }
+
+    @Test
+    void testIsBipartiteTrue() throws MatrixException {
         Graph graph = new Graph(7);
         graph.addEdge(0,3);
         graph.addEdge(0,4);
@@ -247,7 +271,7 @@ class GraphTest {
     }
 
     @Test
-    void testIsBipartiteFalse() {
+    void testIsBipartiteFalse() throws MatrixException {
         Graph graph = new Graph(7);
         graph.addEdge(0,3);
         graph.addEdge(0,4);
@@ -265,8 +289,6 @@ class GraphTest {
         AdjacencyMatrix matrix = new AdjacencyMatrix(0).importMatrix("graph_26_nodes_21_edges.csv");
         Graph graph = new Graph(0).importAdjacencyMatrix(matrix);
 
-        System.out.println(Arrays.toString(graph.greedyColoring()));
-        graph.greedyColoring();
         assertTrue(graph.isBipartite());
     }
 
@@ -279,7 +301,7 @@ class GraphTest {
     }
 
     @Test
-    void  testIsCompleteGraphFalse() {
+    void  testIsCompleteGraphFalse() throws MatrixException {
         Graph graph = new Graph(10);
         graph.addEdge(0,4);
         graph.addEdge(1,8);
@@ -289,7 +311,7 @@ class GraphTest {
     }
 
     @Test
-    void testIsCompleteGraphTrue() {
+    void testIsCompleteGraphTrue() throws MatrixException {
         Graph graph = new Graph(5);
         graph.addEdge(0,1);
         graph.addEdge(0,2);
