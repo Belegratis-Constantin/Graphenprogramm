@@ -3,7 +3,7 @@ package org.example;
 import java.util.*;
 
 public class Graph {
-    private final int V;
+    public final int V;
     private boolean[] visited;
     private int[] parent;
     private int[] discTime; // Discovery Time
