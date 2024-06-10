@@ -3,15 +3,18 @@ package org.example;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
     public static void main(String[] args) throws MatrixException {
         boolean inputGraph = true;
         while(inputGraph) {
             Random rn = new Random();
-
+            Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+            logger.setLevel(Level.ALL);
             Scanner scanner = new Scanner(System.in);
-            System.out.println("Enter filename (don't forget the .csv)");
+            logger.info("Enter filename (don't forget the .csv)");
 
             String filename = scanner.nextLine();
 
@@ -20,7 +23,7 @@ public class Main {
 
             StringBuilder sb = new StringBuilder();
 
-            sb.append("Adjazent Matrix:\n");
+            sb.append("\nAdjazent Matrix:\n");
             sb.append(graph.adjacencyMatrix);
 
             sb.append("\nArtikulationen:\n");
@@ -52,11 +55,11 @@ public class Main {
                 sb.append("\nDer Graph ist NICHT vollständig");
             }
 
-            System.out.println(sb);
+            logger.info(String.valueOf(sb));
 
             for (int i = 0; i < 1; i++) {
                 Scanner again = new Scanner(System.in);
-                System.out.println("Möchten Sie noch einen Graphen berechnen? (J/N)");
+                logger.info("Möchten Sie noch einen Graphen berechnen? (J/N)");
 
                 String answer = again.nextLine();
 
